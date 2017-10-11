@@ -1,16 +1,12 @@
-ARG FROM_TAG
-
-FROM wodby/php-nginx:${FROM_TAG}
+FROM wodby/nginx:1.14
 
 ARG DRUPAL_VER
 
-ENV DRUPAL_VER="${DRUPAL_VER}"
+ENV \
+    DRUPAL_VER="8" \
+    NGINX_DRUPAL_HIDE_HEADERS="On"
 
-USER root
 
-RUN rm /etc/gotpl/default-vhost.conf.tpl
-
-USER www-data
-
-COPY templates /etc/gotpl/
+COPY templates/fastcgi.conf.tpl /etc/gotpl/
+COPY templates/d${DRUPAL_VER}-vhost.conf.tpl /etc/gotpl/vhost.conf.tpl
 COPY init /docker-entrypoint-init.d/

@@ -8,10 +8,18 @@ map $http_x_forwarded_proto $fastcgi_https {
     https on;
 }
 
+# tell fastcgi about protocol in use. in fastcg_params, adjust variable to $fastcgi_port
+map $http_x_forwarded_port $fastcgi_port {
+    default $http_x_forwarded_port;
+    80 80;
+    443 443;
+}
+
 server {
     server_name {{ getenv "NGINX_SERVER_NAME" "drupal" }};
-    listen 80;
+    listen 80 default_server{{ if getenv "NGINX_HTTP2" }} http2{{ end }};
 
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
     root {{ getenv "NGINX_SERVER_ROOT" "/var/www/html/" }};
     index index.php;
 
@@ -22,7 +30,13 @@ server {
     fastcgi_hide_header 'X-Generator';
     fastcgi_hide_header 'X-Drupal-Dynamic-Cache';
 {{ end }}
+
     location / {
+{{ if getenv "NGINX_DRUPAL_FILE_PROXY_URL" }}
+        location ~* /sites/.+/files {
+            try_files $uri @file_proxy;
+        }
+{{ end }}
         location ~* /system/files/ {
             include fastcgi.conf;
             fastcgi_param QUERY_STRING q=$uri&$args;
@@ -32,14 +46,8 @@ server {
             log_not_found off;
         }
 
-        location ~* /sites/.*/files/private/ {
+        location ~* /sites/.+/files/private/ {
             internal;
-        }
-
-        location ~* /imagecache/ {
-            access_log {{ getenv "NGINX_STATIC_CONTENT_ACCESS_LOG" "off" }};
-            expires {{ getenv "NGINX_STATIC_CONTENT_EXPIRES" "30d" }};
-            try_files $uri @drupal;
         }
 
         location ~* /files/styles/ {
@@ -48,7 +56,7 @@ server {
             try_files $uri @drupal;
         }
 
-        location ~* /sites/.*/files/.*\.txt {
+        location ~* /sites/.+/files/.+\.txt {
             access_log {{ getenv "NGINX_STATIC_CONTENT_ACCESS_LOG" "off" }};
             expires {{ getenv "NGINX_STATIC_CONTENT_EXPIRES" "30d" }};
             tcp_nodelay off;
@@ -58,7 +66,7 @@ server {
             open_file_cache_errors off;
         }
 
-        location ~* /sites/.*/files/advagg_css/ {
+        location ~* /sites/.+/files/advagg_css/ {
             expires max;
             add_header ETag '';
             add_header Last-Modified 'Wed, 20 Jan 1988 04:20:42 GMT';
@@ -69,7 +77,7 @@ server {
             }
         }
 
-        location ~* /sites/.*/files/advagg_js/ {
+        location ~* /sites/.+/files/advagg_js/ {
             expires max;
             add_header ETag '';
             add_header Last-Modified 'Wed, 20 Jan 1988 04:20:42 GMT';
@@ -119,21 +127,29 @@ server {
         location ~* ^(?:.+\.(?:htaccess|make|txt|engine|inc|info|install|module|profile|po|pot|sh|.*sql|test|theme|tpl(?:\.php)?|xtmpl)|code-style\.pl|/Entries.*|/Repository|/Root|/Tag|/Template)$ {
             return 404;
         }
+
         try_files $uri @drupal;
     }
 
+{{ if getenv "NGINX_DRUPAL_FILE_PROXY_URL" }}
+    location @file_proxy {
+        rewrite ^ {{ getenv "NGINX_DRUPAL_FILE_PROXY_URL" }}$request_uri? permanent;
+    }
+{{ end }}
+
     location @drupal {
         include fastcgi.conf;
-        fastcgi_param QUERY_STRING q=$no_slash_uri&$args;
+        fastcgi_param QUERY_STRING $query_string;
         fastcgi_param SCRIPT_NAME /index.php;
         fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
         track_uploads {{ getenv "NGINX_DRUPAL_TRACK_UPLOADS" "uploads 60s" }};
     }
 
     location @drupal-no-args {
         include fastcgi.conf;
-        fastcgi_param QUERY_STRING q=$no_slash_uri;
+        fastcgi_param QUERY_STRING q=$uri;
         fastcgi_param SCRIPT_NAME /index.php;
         fastcgi_param SCRIPT_FILENAME $document_root/index.php;
         fastcgi_pass php;
