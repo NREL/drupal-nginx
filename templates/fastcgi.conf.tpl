@@ -28,9 +28,10 @@ fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
 ## Fix HTTPoxy vulnerability https://httpoxy.org/#mitigate-nginx.
 fastcgi_param HTTP_PROXY '';
 
-fastcgi_buffers {{ getenv "NGINX_FASTCGI_BUFFERS" "16 32k" }};
-fastcgi_buffer_size {{ getenv "NGINX_FASTCGI_BUFFER_SIZE" "32k" }};
+fastcgi_buffering off;
+# fastcgi_buffers {{ getenv "NGINX_FASTCGI_BUFFERS" "16 32k" }};
+# fastcgi_buffer_size {{ getenv "NGINX_FASTCGI_BUFFER_SIZE" "32k" }};
+# fastcgi_read_timeout {{ getenv "NGINX_FASTCGI_READ_TIMEOUT" "900" }};
 fastcgi_intercept_errors {{ getenv "NGINX_FASTCGI_INTERCEPT_ERRORS" "on" }};
-fastcgi_read_timeout {{ getenv "NGINX_FASTCGI_READ_TIMEOUT" "900" }};
 fastcgi_keep_conn on;
 fastcgi_index {{ getenv "NGINX_INDEX_FILE" "index.php" }};
