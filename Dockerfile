@@ -1,9 +1,8 @@
+ARG DRUPAL_VER
 FROM wodby/nginx:1.14
 
 ARG DRUPAL_VER
-
 ENV \
-    DRUPAL_VER="8" \
     NGINX_DRUPAL_HIDE_HEADERS="On"
 
 
