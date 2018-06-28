@@ -7,5 +7,5 @@ ENV \
 
 
 COPY templates/fastcgi.conf.tpl /etc/gotpl/
-COPY templates/d${DRUPAL_VER}-vhost.conf.tpl /etc/gotpl/vhost.conf.tpl
+COPY templates/${DRUPAL_VER}-vhost.conf.tpl /etc/gotpl/vhost.conf.tpl
 COPY init /docker-entrypoint-init.d/
