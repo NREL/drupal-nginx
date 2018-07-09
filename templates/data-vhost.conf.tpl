@@ -32,7 +32,7 @@ server {
 {{ end }}
 
     location / {
-        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
+
     }
 
     location @drupal {
@@ -40,6 +40,7 @@ server {
         fastcgi_param QUERY_STRING $query_string;
         fastcgi_param SCRIPT_NAME /index.php;
         fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
         track_uploads {{ getenv "NGINX_DRUPAL_TRACK_UPLOADS" "uploads 60s" }};
     }
@@ -53,6 +54,7 @@ server {
         fastcgi_param QUERY_STRING $args;
         fastcgi_param SCRIPT_NAME /faq.php;
         fastcgi_param SCRIPT_FILENAME $document_root/faq.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
 
@@ -61,6 +63,7 @@ server {
         fastcgi_param QUERY_STRING $args;
         fastcgi_param SCRIPT_NAME /submit.php;
         fastcgi_param SCRIPT_FILENAME $document_root/submit.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
 
@@ -69,6 +72,7 @@ server {
         fastcgi_param QUERY_STRING $args;
         fastcgi_param SCRIPT_NAME /viewdata.php;
         fastcgi_param SCRIPT_FILENAME $document_root/viewdata.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
 
@@ -126,6 +130,7 @@ server {
         fastcgi_param QUERY_STRING $args;
         fastcgi_param SCRIPT_NAME /acs.php;
         fastcgi_param SCRIPT_FILENAME $document_root/acs.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
 
@@ -134,6 +139,7 @@ server {
         fastcgi_param QUERY_STRING $args;
         fastcgi_param SCRIPT_NAME /api.php;
         fastcgi_param SCRIPT_FILENAME $document_root/api.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
 
@@ -143,6 +149,7 @@ server {
         fastcgi_param QUERY_STRING $args;
         fastcgi_param SCRIPT_NAME /auth.php;
         fastcgi_param SCRIPT_FILENAME $document_root/auth.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
 
@@ -151,6 +158,7 @@ server {
         fastcgi_param QUERY_STRING $args;
         fastcgi_param SCRIPT_NAME /f-login.php;
         fastcgi_param SCRIPT_FILENAME $document_root/f-login.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
 
@@ -159,6 +167,7 @@ server {
         fastcgi_param QUERY_STRING $args;
         fastcgi_param SCRIPT_NAME /curate.php;
         fastcgi_param SCRIPT_FILENAME $document_root/curate.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
 
@@ -167,6 +176,7 @@ server {
         fastcgi_param QUERY_STRING $args;
         fastcgi_param SCRIPT_NAME /disclaimer.php;
         fastcgi_param SCRIPT_FILENAME $document_root/disclaimer.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
 
@@ -175,6 +185,7 @@ server {
         fastcgi_param QUERY_STRING $args;
         fastcgi_param SCRIPT_NAME /edit.php;
         fastcgi_param SCRIPT_FILENAME $document_root/edit.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
 
@@ -183,6 +194,7 @@ server {
         fastcgi_param QUERY_STRING $args;
         fastcgi_param SCRIPT_NAME /error.php;
         fastcgi_param SCRIPT_FILENAME $document_root/error.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
 
@@ -191,6 +203,7 @@ server {
         fastcgi_param QUERY_STRING $args;
         fastcgi_param SCRIPT_NAME /notes.php;
         fastcgi_param SCRIPT_FILENAME $document_root/notes.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
 
@@ -199,6 +212,7 @@ server {
         fastcgi_param QUERY_STRING $args;
         fastcgi_param SCRIPT_NAME /search.php;
         fastcgi_param SCRIPT_FILENAME $document_root/search.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
 
@@ -207,6 +221,7 @@ server {
         fastcgi_param QUERY_STRING $args;
         fastcgi_param SCRIPT_NAME /secure_dl.php;
         fastcgi_param SCRIPT_FILENAME $document_root/secure_dl.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
 
@@ -215,6 +230,7 @@ server {
         fastcgi_param QUERY_STRING $args;
         fastcgi_param SCRIPT_NAME /stats.php;
         fastcgi_param SCRIPT_FILENAME $document_root/stats.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
 
@@ -223,6 +239,7 @@ server {
         fastcgi_param QUERY_STRING $args;
         fastcgi_param SCRIPT_NAME /view.php;
         fastcgi_param SCRIPT_FILENAME $document_root/view.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
 
@@ -231,6 +248,7 @@ server {
         fastcgi_param QUERY_STRING $args;
         fastcgi_param SCRIPT_NAME /test.php;
         fastcgi_param SCRIPT_FILENAME $document_root/test.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
 
