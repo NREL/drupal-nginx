@@ -31,11 +31,7 @@ server {
     fastcgi_hide_header 'X-Drupal-Dynamic-Cache';
 {{ end }}
 
-    location / {
-        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
-    }
-
-    location @drupal {
+    location ~ [^/]\.php(/|$) {
         include fastcgi.conf;
         fastcgi_param QUERY_STRING $query_string;
         fastcgi_param SCRIPT_NAME /index.php;
@@ -46,8 +42,12 @@ server {
     }
 
     location = /index.php {
-        fastcgi_pass php;
+        include fastcgi.conf;
+        fastcgi_param QUERY_STRING $query_string;
+        fastcgi_param SCRIPT_NAME /index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root/index.php;
         fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
+        fastcgi_pass php;
     }
 
     location = /faq {
