@@ -32,7 +32,7 @@ server {
 {{ end }}
 
     location / {
-
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
     }
 
     location @drupal {
@@ -47,6 +47,7 @@ server {
 
     location = /index.php {
         fastcgi_pass php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
     }
 
     location = /faq {
