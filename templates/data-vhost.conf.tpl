@@ -50,6 +50,15 @@ server {
         fastcgi_pass php;
     }
 
+    location = /showme.php {
+        include fastcgi.conf;
+        fastcgi_param QUERY_STRING $args;
+        fastcgi_param SCRIPT_NAME /showme.php;
+        fastcgi_param SCRIPT_FILENAME $document_root/showme.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
+        fastcgi_pass php;
+    }
+
     location = /faq {
         include fastcgi.conf;
         fastcgi_param QUERY_STRING $args;
