@@ -59,6 +59,16 @@ server {
         fastcgi_pass php;
     }
 
+    location = /acs.php {
+       include fastcgi.conf;
+       fastcgi_param QUERY_STRING $args;
+       fastcgi_param SCRIPT_NAME /acs.php;
+       fastcgi_param SCRIPT_FILENAME $document_root/acs.php;
+       fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
+       fastcgi_pass php;
+    }
+
+
     location = /faq {
         include fastcgi.conf;
         fastcgi_param QUERY_STRING $args;
