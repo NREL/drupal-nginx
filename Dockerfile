@@ -1,6 +1,6 @@
 ARG DRUPAL_VER
 
-FROM wodby/nginx:1.14
+FROM wodby/nginx:1.14-4.1.0
 
 ARG DRUPAL_VER
 
