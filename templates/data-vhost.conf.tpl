@@ -50,6 +50,11 @@ server {
         fastcgi_pass php;
     }
 
+    location = /home {
+       index  index.html index.php;
+       try_files $uri $uri/ /index.php$uri?$args;
+    }
+
     location = /fileupload/index.php {
         include fastcgi.conf;
         fastcgi_param QUERY_STRING $args;
@@ -172,6 +177,12 @@ server {
         fastcgi_pass php;
     }
 
+    location = /rest-api {
+       index  index.html index.php;
+       try_files $uri $uri/ /rest-api/index.php$uri?$args;
+    }
+
+
 
     location = /auth.php {
         include fastcgi.conf;
@@ -250,6 +261,15 @@ server {
         fastcgi_param QUERY_STRING $args;
         fastcgi_param SCRIPT_NAME /secure_dl.php;
         fastcgi_param SCRIPT_FILENAME $document_root/secure_dl.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
+        fastcgi_pass php;
+    }
+
+    location = /dl {
+        include fastcgi.conf;
+        fastcgi_param QUERY_STRING $args;
+        fastcgi_param SCRIPT_NAME /dl.php;
+        fastcgi_param SCRIPT_FILENAME $document_root/dl.php;
         fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
