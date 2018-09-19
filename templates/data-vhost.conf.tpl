@@ -31,6 +31,21 @@ server {
     fastcgi_hide_header 'X-Drupal-Dynamic-Cache';
 {{ end }}
 
+   
+
+
+    location /files/ {
+        # proxy_set_header Host 'nrel-datacat-public-stage.s3.amazonaws.com';
+        # proxy_hide_header x-amz-id-2;
+        # proxy_hide_header x-amz-request-id;
+        # proxy_hide_header Set-Cookie;
+        # proxy_ignore_headers "Set-Cookie";
+        # proxy_intercept_errors on;
+        # access_log off;
+        # log_not_found off;
+        proxy_pass https://nrel-datacat-public-{{ getenv "DEPLOY_ENV" "prod" }}.s3.amazonaws.com/files/;
+    }
+
     location ~ [^/]\.php(/|$) {
         include fastcgi.conf;
         fastcgi_param QUERY_STRING $query_string;
