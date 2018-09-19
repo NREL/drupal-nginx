@@ -138,6 +138,36 @@ server {
     }
 {{ end }}
 
+    location ^~ /simplesaml {
+      alias /var/www/html/docroot/simplesaml;
+      location ~ ^(?<prefix>/simplesaml)(?<phpfile>.+?\.php)(?<pathinfo>/.*)?$ {
+          include fastcgi.conf;
+          fastcgi_pass php;
+          fastcgi_param SCRIPT_FILENAME $document_root$phpfile;
+          fastcgi_param PATH_INFO $pathinfo if_not_empty;
+      }
+    }
+
+    # We could use any alias, as long it matches the config.php of SimpleSAML.
+    # location ^~ /simplesaml {
+    #     # Point to our library folder webroot.
+    #     # alias /var/www/drupal-sp.master/www/sites/all/libraries/simplesamlphp-1.14.8/www;
+    #     location ~ ^(?<prefix>/simplesaml)(?<phpfile>.+?\.php)(?<pathinfo>/.*)?$ {
+    #         fastcgi_split_path_info ^(.+?\.php)(/.+)$;
+    #         fastcgi_pass php;
+    #         fastcgi_index index.php;
+    #         # Note we include the fastcgi config copied and modified above.
+    #         include fastcgi_params_path_info;
+    #         fastcgi_param SCRIPT_FILENAME $document_root$phpfile;
+    #         fastcgi_param PATH_INFO $pathinfo if_not_empty;
+    #    }
+    #    # This looks extremly weird, and it is. Workaround a NGINX bug. @see https://trac.nginx.org/nginx/ticket/97
+    #    # Without this the assets (js/css/img) won't be served.
+    #    location ~ ^(?<prefix>/simplesaml/resources/)(?<assetfile>.+?\.(js|css|png|jpg|jpeg|gif|ico))$ {
+    #         return 301 $scheme://$server_name/sites/all/libraries/simplesamlphp-1.14.8/www/resources/$assetfile;
+    #     }
+    # }
+
     location @drupal {
         include fastcgi.conf;
         fastcgi_param QUERY_STRING $query_string;

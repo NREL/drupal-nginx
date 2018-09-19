@@ -31,7 +31,7 @@ server {
     fastcgi_hide_header 'X-Drupal-Dynamic-Cache';
 {{ end }}
 
-   
+
 
 
     location /files/ {
@@ -44,6 +44,55 @@ server {
         # access_log off;
         # log_not_found off;
         proxy_pass https://nrel-datacat-public-{{ getenv "DEPLOY_ENV" "prod" }}.s3.amazonaws.com/files/;
+    }
+
+
+    location /rest-api {
+        alias /var/www/html/docroot/rest-api;
+        try_files $uri $uri/ @rest-api;
+
+        location ~ \.php$ {
+            include fastcgi.conf;
+            fastcgi_split_path_info ^(.+\.php)(/.+)$;
+            fastcgi_param SCRIPT_FILENAME $request_filename;
+            fastcgi_pass php;
+        }
+    }
+
+    location @rest-api {
+        rewrite /rest-api/(.*)$ /rest-api/index.php?/$1 last;
+    }
+
+    location /ckan/api/2/search {
+        alias /var/www/html/docroot/ckan/api/2/search;
+        try_files $uri $uri/ @search;
+
+        location ~ \.php$ {
+            include fastcgi.conf;
+            fastcgi_split_path_info ^(.+\.php)(/.+)$;
+            fastcgi_param SCRIPT_FILENAME $request_filename;
+            fastcgi_pass php;
+        }
+    }
+
+    location @search {
+        rewrite /ckan/api/2/search/(.*)$ /ckan/api/2/search/index.php?/$1 last;
+    }
+
+    location /ckan/api/2/rest {
+        alias /var/www/html/docroot/ckan/api/2/rest;
+        try_files $uri $uri/ @rest;
+
+        location ~ \.php$ {
+            include fastcgi.conf;
+            fastcgi_split_path_info ^(.+\.php)(/.+)$;
+            fastcgi_param SCRIPT_FILENAME $request_filename;
+            fastcgi_pass php;
+        }
+    }
+
+    location @rest {
+        rewrite /ckan/api/2/rest/(.*)$ /ckan/api/2/rest/index.php?/$1 last;
     }
 
     location ~ [^/]\.php(/|$) {
@@ -131,7 +180,7 @@ server {
 
     location ~ /submissions/([0-9]+|all|mine)$ {
             rewrite ^/submissions/([0-9]+|all|mine)$ /view.php?id=$1 last;
-    }           
+    }
 
     # location ~* /submissions/([0-9]+|all|mine)$ {
     #     include fastcgi.conf;
@@ -191,13 +240,6 @@ server {
         fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
-
-    location = /rest-api {
-       index  index.html index.php;
-       try_files $uri $uri/ /rest-api/index.php$uri?$args;
-    }
-
-
 
     location = /auth.php {
         include fastcgi.conf;
