@@ -32,20 +32,31 @@ server {
 {{ end }}
 
 
+    location / {
+
+        location /files/ {
+            # proxy_set_header Host 'nrel-datacat-public-stage.s3.amazonaws.com';
+            # proxy_hide_header x-amz-id-2;
+            # proxy_hide_header x-amz-request-id;
+            # proxy_hide_header Set-Cookie;
+            # proxy_ignore_headers "Set-Cookie";
+            # proxy_intercept_errors on;
+            # access_log off;
+            # log_not_found off;
+            proxy_pass https://nrel-datacat-public-{{ getenv "DEPLOY_ENV" "prod" }}.s3.amazonaws.com/files/;
+        }
+    
+        location ~ /submissions/?$ {
+            rewrite ^ /view.php?id=all;
+        }
+    
+        location ~ /submissions/([0-9]+|all|mine)$ {
+                rewrite ^/submissions/([0-9]+|all|mine)$ /view.php?id=$1 last;
+        }
 
 
-    location /files/ {
-        # proxy_set_header Host 'nrel-datacat-public-stage.s3.amazonaws.com';
-        # proxy_hide_header x-amz-id-2;
-        # proxy_hide_header x-amz-request-id;
-        # proxy_hide_header Set-Cookie;
-        # proxy_ignore_headers "Set-Cookie";
-        # proxy_intercept_errors on;
-        # access_log off;
-        # log_not_found off;
-        proxy_pass https://nrel-datacat-public-{{ getenv "DEPLOY_ENV" "prod" }}.s3.amazonaws.com/files/;
+
     }
-
 
     location /rest-api {
         alias /var/www/html/docroot/rest-api;
@@ -55,6 +66,7 @@ server {
             include fastcgi.conf;
             fastcgi_split_path_info ^(.+\.php)(/.+)$;
             fastcgi_param SCRIPT_FILENAME $request_filename;
+            fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
             fastcgi_pass php;
         }
     }
@@ -71,6 +83,7 @@ server {
             include fastcgi.conf;
             fastcgi_split_path_info ^(.+\.php)(/.+)$;
             fastcgi_param SCRIPT_FILENAME $request_filename;
+            fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
             fastcgi_pass php;
         }
     }
@@ -87,6 +100,7 @@ server {
             include fastcgi.conf;
             fastcgi_split_path_info ^(.+\.php)(/.+)$;
             fastcgi_param SCRIPT_FILENAME $request_filename;
+            fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
             fastcgi_pass php;
         }
     }
@@ -94,6 +108,16 @@ server {
     location @rest {
         rewrite /ckan/api/2/rest/(.*)$ /ckan/api/2/rest/index.php?/$1 last;
     }
+
+    location = /fileupload/index.php {
+        include fastcgi.conf;
+        fastcgi_param QUERY_STRING $args;
+        fastcgi_param SCRIPT_NAME /fileupload/index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root/fileupload/index.php;
+        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
+        fastcgi_pass php;
+    }
+
 
     location ~ [^/]\.php(/|$) {
         include fastcgi.conf;
@@ -119,14 +143,6 @@ server {
        try_files $uri $uri/ /index.php$uri?$args;
     }
 
-    location = /fileupload/index.php {
-        include fastcgi.conf;
-        fastcgi_param QUERY_STRING $args;
-        fastcgi_param SCRIPT_NAME /fileupload/index.php;
-        fastcgi_param SCRIPT_FILENAME $document_root/fileupload/index.php;
-        fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
-        fastcgi_pass php;
-    }
 
     location = /showme.php {
         include fastcgi.conf;
@@ -173,47 +189,6 @@ server {
         fastcgi_param WWW_NREL {{ getenv "WWW_NREL" "PROD" }};
         fastcgi_pass php;
     }
-
-    location ~ /submissions/?$ {
-        rewrite ^ /view.php?id=all;
-    }
-
-    location ~ /submissions/([0-9]+|all|mine)$ {
-            rewrite ^/submissions/([0-9]+|all|mine)$ /view.php?id=$1 last;
-    }
-
-    # location ~* /submissions/([0-9]+|all|mine)$ {
-    #     include fastcgi.conf;
-    #     fastcgi_param QUERY_STRING $args;
-    #     fastcgi_param SCRIPT_NAME /view.php;
-    #     fastcgi_param SCRIPT_FILENAME $document_root/view.php;
-    #     fastcgi_pass php;
-    # }
-
-# RewriteCond %{QUERY_STRING} base64_encode.*\(.*\) [OR]
-# RewriteCond %{QUERY_STRING} (\<|%3C).*script.*(\>|%3E) [NC,OR]
-# RewriteCond %{QUERY_STRING} (\<|%3C).*iframe.*(\>|%3E) [NC,OR]
-# RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
-# RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2})
-# RewriteRule ^(.*)$ error.php [F,L]
-
-# RewriteCond %{REQUEST_METHOD} ^(TRACE|TRACK)
-# RewriteRule .* - [F,L]
-
-# RewriteRule ([a-zA-Z0-9_-]+)\.php/ error.php [R]
-
-# RewriteRule ^home$ index.php
-# RewriteRule ^files/$ error.php?m=403
-
-# RewriteCond %{REQUEST_URI} ^(.*)datasets?(.*)
-# RewriteRule .* %1submissions%2 [R=301,L]
-
-# RewriteRule submissions$ %{REQUEST_URI}/ [R,L]
-# RewriteRule submissions/?$ view.php?id=all
-# RewriteRule submissions/([0-9]+|all|mine)$ view.php?id=$1 [QSA]
-
-# RewriteRule ^([a-zA-Z0-9_-]+)(?!\.php)$ $1.php [L]
-
 
     location = /about {
         include fastcgi.conf;

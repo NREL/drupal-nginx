@@ -20,7 +20,7 @@ server {
     server_name {{ getenv "NGINX_SERVER_NAME" "drupal" }};
     listen 80 default_server{{ if getenv "NGINX_HTTP2" }} http2{{ end }};
 
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    # add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
     root {{ getenv "NGINX_SERVER_ROOT" "/var/www/html/" }};
     index index.php;
 
@@ -105,6 +105,10 @@ server {
             try_files $uri @drupal;
         }
 {{ end }}
+    ## PWA serviceworker support.
+        location ~ ^/pwa/[0-9a-z]+/serviceworker.js {
+            try_files $uri /index.php?$query_string;
+        }
         location ~* ^.+\.(?:css|cur|js|jpe?g|gif|htc|ico|png|xml|otf|ttf|eot|woff|woff2|svg|svgz)$ {
             access_log {{ getenv "NGINX_STATIC_CONTENT_ACCESS_LOG" "off" }};
             expires {{ getenv "NGINX_STATIC_CONTENT_EXPIRES" "30d" }};
